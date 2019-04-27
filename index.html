@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Snake</title>
+    <style>
+        * {padding: 0; margin: 0; }
+        canvas {background: #eee; display: block; margin: 0 auto; transform: translateY(50%)}
+    </style>
+</head>
+<body>
+    <canvas width ="1200" height="500" id="snakeGame"></canvas>
+</body>
+<script>
+const canvas = document.getElementById('snakeGame')
+const ctx = canvas.getContext("2d");
+
+var snakeWidth = 50;
+var snakeHeight = 10;
+var xPosition = (canvas.width - snakeWidth) / 2;
+var yPosition = (canvas.height - snakeHeight) /2;
+var isMovingRightPressed = false;
+var isMovingLeftPressed = false;
+var isMovingUpPressed = false;
+var isMovingDownPressed = false;
+var isGoingUp = false;
+
+
+let isGrowing = false;
+
+var foodWidth = 15;
+var foodHeight = 15;
+
+var quantityOfFood = 10;
+var food = [];
+
+for(var i = 0; i < quantityOfFood; i++) {
+    var x = (Math.floor(Math.random() * (canvas.width- foodWidth)) + 1) ;
+    var y = (Math.floor(Math.random() * (canvas.height- foodHeight)) + 1) ;
+    food[i] = {x, y, alive: 1}
+}
+
+function drawSnake() {
+    ctx.beginPath();
+    (isGoingUp) ? ctx.rect(xPosition, yPosition ,snakeHeight,snakeWidth) : ctx.rect(xPosition, yPosition ,snakeWidth,snakeHeight);
+        ctx.fillStyle = "#0095DD";
+        ctx.fill();
+    ctx.closePath();
+}
+
+function collisionDetection() {
+   
+    for(var i = 0; i < quantityOfFood; i++) {
+       if((xPosition > food[i].x && xPosition < food[i].x +foodWidth) && (yPosition > food[i].y && yPosition < food[i].y +foodHeight))
+       {
+
+           food[i].alive = 0;
+           isGrowing = true;
+       }
+       else 
+       {
+        isGrowing = false;
+       }
+
+       if(isGrowing) {
+        snakeWidth += foodWidth;
+    }
+    }
+  
+}
+
+function drawFood()
+{
+    for(var i = 0; i < quantityOfFood; i++)
+     {  
+         if(food[i].alive == 1)
+         {
+            ctx.beginPath();
+                ctx.rect(food[i].x,food[i].y, foodWidth, foodHeight );
+                ctx.fillStyle = "#FF8900";
+                ctx.fill();
+            ctx.closePath(); 
+         }
+    }
+
+
+}
+function draw(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawSnake();
+    drawFood();
+    collisionDetection();
+    if(isMovingRightPressed) {
+        xPosition += 1;
+        isGoingUp = false;
+    }
+    if(isMovingLeftPressed) {
+        xPosition -= 1;
+        isGoingUp = false;
+    }
+    if(isMovingUpPressed) {
+        yPosition -= 1;
+        isGoingUp = true;
+    }
+    if(isMovingDownPressed) {
+        yPosition += 1;
+        isGoingUp = true;
+    }
+}
+
+function keyDownHandler(e) {
+    switch(e.code) {
+        case "ArrowRight" :
+            isMovingRightPressed = true;
+        break;
+        case "ArrowLeft" :
+            isMovingLeftPressed = true;
+        break;
+        case "ArrowUp" :
+            isMovingUpPressed = true;
+        break;
+        case "ArrowDown" :
+            isMovingDownPressed = true;
+        break;
+    }
+    
+}
+function keyUpHandler(e) {
+    switch(e.code) {
+        case "ArrowRight" :
+            isMovingRightPressed = false;
+        break;
+        case "ArrowLeft" :
+            isMovingLeftPressed = false;
+        break;
+        case "ArrowUp" :
+            isMovingUpPressed = false;
+        break;
+        case "ArrowDown" :
+            isMovingDownPressed = false;
+        break;
+    }
+
+}
+document.addEventListener('keyup', keyUpHandler,false)
+document.addEventListener('keydown', keyDownHandler, false)
+
+
+setInterval(draw, 10);
+</script>
+</html>
